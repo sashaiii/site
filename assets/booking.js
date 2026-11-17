@@ -145,4 +145,39 @@ function handleSubmit(event) {
 
   const roomId = document.getElementById('roomId').value;
   if (!roomId) {
-    errorAlert.textContent = 'Ошибка: номер
+    errorAlert.textContent = 'Ошибка: номер не выбран. Вернитесь в каталог.';
+    errorAlert.classList.add('visible');
+    return;
+  }
+
+  const values = validateForm();
+  if (!values) {
+    errorAlert.textContent = 'Пожалуйста, исправьте ошибки в форме.';
+    errorAlert.classList.add('visible');
+    return;
+  }
+
+  // Имитация отправки на сервер (в Задании 3 — fetch на booking.php)
+  console.log('Отправка заявки:', { roomId, ...values });
+
+  successAlert.textContent = `✅ Заявка успешно отправлена! Номер: ${roomId}. Мы свяжемся с вами по телефону ${values.phone} для подтверждения.`;
+  successAlert.classList.add('visible');
+  document.getElementById('bookingForm').reset();
+  document.getElementById('roomId').value = roomId;
+}
+
+// ---- Инициализация ----
+document.addEventListener('DOMContentLoaded', () => {
+  showRoomInfo();
+  document.getElementById('bookingForm').addEventListener('submit', handleSubmit);
+
+  // Живая валидация при потере фокуса
+  ['firstName', 'lastName', 'phone', 'email', 'checkIn', 'checkOut'].forEach(id => {
+    document.getElementById(id).addEventListener('blur', () => {
+      const value = document.getElementById(id).value.trim();
+      if (!value) { setError(id, 'Поле обязательно для заполнения'); return; }
+      if (!RULES[id].test(value)) setError(id, RULES[id].message);
+      else setError(id, '');
+    });
+  });
+});
